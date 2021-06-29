@@ -15,6 +15,9 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String email;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_authorities",
@@ -52,6 +55,15 @@ public class UserEntity extends BaseEntity {
         return this;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public UserEntity setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,9 +80,10 @@ public class UserEntity extends BaseEntity {
 
     @Override
     public String toString() {
-        return String.format("UserEntity {%s, username : %s, authorities : %s}",
+        return String.format("UserEntity {%s, username : %s, email : %s authorities : %s}",
                 super.toString(),
                 this.username,
+                this.email,
                 this.authorities
                         .stream()
                         .map(AuthorityEntity::toString)

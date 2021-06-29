@@ -10,6 +10,7 @@ public class UserDetailsServiceModel extends BaseServiceModel implements UserDet
 
     private String username;
     private String password;
+    private String email;
     private Set<GrantedAuthorityServiceModel> authorities;
 
     public UserDetailsServiceModel() { }
@@ -34,6 +35,15 @@ public class UserDetailsServiceModel extends BaseServiceModel implements UserDet
         return this;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public UserDetailsServiceModel setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
     @Override
     public Set<GrantedAuthorityServiceModel> getAuthorities() {
         return authorities;
@@ -43,6 +53,7 @@ public class UserDetailsServiceModel extends BaseServiceModel implements UserDet
         this.authorities = authorities;
         return this;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {
@@ -80,9 +91,10 @@ public class UserDetailsServiceModel extends BaseServiceModel implements UserDet
 
     @Override
     public String toString() {
-        return String.format("UserDetailsImpl : {%s , username : %s , authorities : %s}",
+        return String.format("UserDetailsImpl : {%s , username : %s , email : %s, authorities : %s}",
                 super.toString(),
                 this.username,
+                this.email,
                 this.authorities
                         .stream()
                         .map(GrantedAuthorityServiceModel::getAuthority)
