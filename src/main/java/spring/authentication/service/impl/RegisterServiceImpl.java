@@ -15,6 +15,9 @@ import spring.authentication.exception.UsernameExistsException;
 import spring.authentication.service.RegisterService;
 import spring.authentication.service.models.UserDetailsServiceModel;
 
+import javax.transaction.Transactional;
+import java.util.Set;
+
 @Service
 public class RegisterServiceImpl implements RegisterService {
 
@@ -25,7 +28,8 @@ public class RegisterServiceImpl implements RegisterService {
 
     public RegisterServiceImpl(ModelMapper modelMapper,
                                UserRepository userRepository,
-                               AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
+                               AuthorityRepository authorityRepository,
+                               PasswordEncoder passwordEncoder) {
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
@@ -33,6 +37,7 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     @Override
+    @Transactional
     public UserDetailsServiceModel registerUser(UserDetailsServiceModel serviceModel) {
         if(this.userRepository.existsByUsername(serviceModel.getUsername())){
             throw new UsernameExistsException();
@@ -42,23 +47,11 @@ public class RegisterServiceImpl implements RegisterService {
         }
         UserEntity userEntity = this.modelMapper.map(serviceModel, UserEntity.class);
         userEntity.setPassword(this.passwordEncoder.encode(userEntity.getPassword()));
-        serviceModel
-                .getAuthorities()
-                .stream()
-                .map(this::getAuthorityEntityByString)
-                .forEach(a-> userEntity.getAuthorities().add(a));
+        AuthorityEntity userAuthority = this.authorityRepository
+                .getByAuthority(AuthorityEnum.USER)
+                .orElseThrow(AuthorityNotExistsException::new);
+        userEntity.setAuthorities(Set.of(userAuthority));
         UserEntity savedEntity = this.userRepository.save(userEntity);
         return this.modelMapper.map(savedEntity,UserDetailsServiceModel.class);
-    }
-
-    private AuthorityEntity getAuthorityEntityByString(GrantedAuthority grantedAuthority){
-        try {
-            String name = grantedAuthority.getAuthority();
-            return  this.authorityRepository
-                    .getByAuthority(AuthorityEnum.valueOf(name))
-                    .get();
-        }catch (Exception exception){
-            throw new AuthorityNotExistsException();
-        }
     }
 }

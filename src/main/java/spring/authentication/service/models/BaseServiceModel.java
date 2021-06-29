@@ -6,7 +6,7 @@ public abstract class BaseServiceModel {
 
     private String id;
 
-    protected BaseServiceModel() { }
+    public BaseServiceModel() { }
 
     public String getId() {
         return id;

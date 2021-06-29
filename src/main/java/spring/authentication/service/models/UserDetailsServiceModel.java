@@ -2,6 +2,7 @@ package spring.authentication.service.models;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,7 +12,7 @@ public class UserDetailsServiceModel extends BaseServiceModel implements UserDet
     private String username;
     private String password;
     private String email;
-    private Set<GrantedAuthorityServiceModel> authorities;
+    private Set<GrantedAuthorityServiceModel> authorities = new HashSet<>();
 
     public UserDetailsServiceModel() { }
 
