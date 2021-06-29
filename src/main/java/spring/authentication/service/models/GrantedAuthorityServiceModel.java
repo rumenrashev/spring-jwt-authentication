@@ -1,13 +1,14 @@
 package spring.authentication.service.models;
 
 import org.springframework.security.core.GrantedAuthority;
+import spring.authentication.data.entities.AuthorityEnum;
 
 import java.util.Objects;
 
 public class GrantedAuthorityServiceModel extends BaseServiceModel implements GrantedAuthority {
 
     private String id;
-    private String authority;
+    private AuthorityEnum authority;
 
     public GrantedAuthorityServiceModel() { }
 
@@ -22,10 +23,10 @@ public class GrantedAuthorityServiceModel extends BaseServiceModel implements Gr
 
     @Override
     public String getAuthority() {
-        return authority;
+        return authority.name();
     }
 
-    public GrantedAuthorityServiceModel setAuthority(String authority) {
+    public GrantedAuthorityServiceModel setAuthority(AuthorityEnum authority) {
         this.authority = authority;
         return this;
     }

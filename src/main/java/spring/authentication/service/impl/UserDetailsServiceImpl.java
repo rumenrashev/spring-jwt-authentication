@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import spring.authentication.data.repositories.UserRepository;
 import spring.authentication.service.models.UserDetailsServiceModel;
-import static spring.authentication.constants.ExceptionMessages.USERNAME_NOT_FOUND_EXCEPTION_MESSAGE;
+import static spring.authentication.exception.ExceptionMessages.USERNAME_NOT_FOUND_EXCEPTION_MESSAGE;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
