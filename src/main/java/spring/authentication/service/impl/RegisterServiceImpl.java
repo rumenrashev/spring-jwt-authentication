@@ -2,6 +2,7 @@ package spring.authentication.service.impl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.authentication.data.entities.AuthorityEntity;
 import spring.authentication.data.entities.AuthorityEnum;
@@ -20,13 +21,15 @@ public class RegisterServiceImpl implements RegisterService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public RegisterServiceImpl(ModelMapper modelMapper,
                                UserRepository userRepository,
-                               AuthorityRepository authorityRepository) {
+                               AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -38,6 +41,7 @@ public class RegisterServiceImpl implements RegisterService {
             throw new EmailExistsException();
         }
         UserEntity userEntity = this.modelMapper.map(serviceModel, UserEntity.class);
+        userEntity.setPassword(this.passwordEncoder.encode(userEntity.getPassword()));
         serviceModel
                 .getAuthorities()
                 .stream()
