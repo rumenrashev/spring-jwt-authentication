@@ -4,16 +4,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.BindingResult;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import spring.authentication.exception.EmailExistsException;
-import spring.authentication.exception.ExceptionMessages;
-import spring.authentication.exception.UsernameExistsException;
+import spring.authentication.service.LoginService;
 import spring.authentication.service.RegisterService;
 import spring.authentication.service.models.UserDetailsServiceModel;
+import spring.authentication.web.models.JwtResponse;
+import spring.authentication.web.models.LoginRequest;
 import spring.authentication.web.models.MessageResponse;
 import spring.authentication.web.models.RegisterRequest;
 
@@ -29,19 +28,36 @@ public class AuthenticationController {
 
     private final ModelMapper modelMapper;
     private final RegisterService registerService;
+    private final LoginService loginService;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthenticationController(ModelMapper modelMapper, RegisterService registerService) {
+    public AuthenticationController(ModelMapper modelMapper,
+                                    RegisterService registerService,
+                                    LoginService loginService,
+                                    AuthenticationManager authenticationManager) {
         this.modelMapper = modelMapper;
         this.registerService = registerService;
+        this.loginService = loginService;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
         UserDetailsServiceModel serviceModel =
                 this.modelMapper.map(registerRequest, UserDetailsServiceModel.class);
-            this.registerService.registerUser(serviceModel);
-            return ResponseEntity.ok(new MessageResponse("Successful registration"));
+        this.registerService.registerUser(serviceModel);
+        return ResponseEntity
+                .ok(new MessageResponse("Successful registration"));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest loginRequest){
+        JwtResponse jwtResponse = this.loginService.login(loginRequest, authenticationManager);
+        return ResponseEntity
+                .ok()
+                .body(jwtResponse);
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
