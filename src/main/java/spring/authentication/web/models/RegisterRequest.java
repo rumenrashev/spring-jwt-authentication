@@ -1,11 +1,22 @@
 package spring.authentication.web.models;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
 public class RegisterRequest {
 
+    @NotBlank(message = "Username is required.")
+    @Size(min = 6, max = 20,message = "Username must be between 6 and 20 characters")
     private String username;
+
+    @NotBlank(message = "Email is required.")
+    @Email(message = "Valid email is required!")
     private String email;
+
+    @NotBlank(message = "Username is required.")
+    @Size(min = 6, max = 20,message = "Username must be between 6 and 20 characters")
     private String password;
 
     public RegisterRequest() {
