@@ -14,6 +14,7 @@ import spring.authentication.exception.EmailExistsException;
 import spring.authentication.exception.UsernameExistsException;
 import spring.authentication.service.RegisterService;
 import spring.authentication.service.models.UserDetailsServiceModel;
+import spring.authentication.web.models.RegisterRequest;
 
 import javax.transaction.Transactional;
 import java.util.Set;
@@ -36,22 +37,23 @@ public class RegisterServiceImpl implements RegisterService {
         this.passwordEncoder = passwordEncoder;
     }
 
+
     @Override
     @Transactional
-    public UserDetailsServiceModel registerUser(UserDetailsServiceModel serviceModel) {
-        if(this.userRepository.existsByUsername(serviceModel.getUsername())){
+    public String registerUser(RegisterRequest registerRequest) {
+        if(this.userRepository.existsByUsername(registerRequest.getUsername())){
             throw new UsernameExistsException();
         }
-        if(this.userRepository.existsByEmail(serviceModel.getEmail())){
+        if(this.userRepository.existsByEmail(registerRequest.getEmail())){
             throw new EmailExistsException();
         }
-        UserEntity userEntity = this.modelMapper.map(serviceModel, UserEntity.class);
+        UserEntity userEntity = this.modelMapper.map(registerRequest, UserEntity.class);
         userEntity.setPassword(this.passwordEncoder.encode(userEntity.getPassword()));
         AuthorityEntity userAuthority = this.authorityRepository
                 .getByAuthority(AuthorityEnum.USER)
                 .orElseThrow(AuthorityNotExistsException::new);
         userEntity.setAuthorities(Set.of(userAuthority));
         UserEntity savedEntity = this.userRepository.save(userEntity);
-        return this.modelMapper.map(savedEntity,UserDetailsServiceModel.class);
+        return savedEntity.getUsername();
     }
 }

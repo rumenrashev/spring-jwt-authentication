@@ -10,5 +10,4 @@ public class UsernameExistsException extends RuntimeException {
     public UsernameExistsException() {
         super(USERNAME_EXISTS_MESSAGE);
     }
-
 }

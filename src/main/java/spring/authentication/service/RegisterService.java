@@ -1,8 +1,9 @@
 package spring.authentication.service;
 
 import spring.authentication.service.models.UserDetailsServiceModel;
+import spring.authentication.web.models.RegisterRequest;
 
 public interface RegisterService {
 
-    UserDetailsServiceModel registerUser(UserDetailsServiceModel serviceModel);
+    String registerUser(RegisterRequest registerRequest);
 }
