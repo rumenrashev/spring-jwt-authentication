@@ -17,11 +17,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static spring.authentication.web.constants.AuthenticationPaths.LOGIN_PATH;
+import static spring.authentication.constants.GlobalConstants.LOGIN_URL;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class LoginControllerTests {
+public class LoginRestControllerTests {
 
     @MockBean
     LoginService loginService;
@@ -40,7 +40,7 @@ public class LoginControllerTests {
         when(loginService.login(loginRequest, authenticationManager))
                 .thenReturn(new JwtResponse());
 
-        this.mockMvc.perform(post(LOGIN_PATH)
+        this.mockMvc.perform(post(LOGIN_URL)
                 .contentType(APPLICATION_JSON)
                 .content(LOGIN_REQUEST_CONTENT)
                 .accept(APPLICATION_JSON))
@@ -50,7 +50,7 @@ public class LoginControllerTests {
     @Test
     @WithMockUser
     void login_ShouldReturnStatus403() throws Exception {
-        this.mockMvc.perform(post(LOGIN_PATH)
+        this.mockMvc.perform(post(LOGIN_URL)
                 .contentType(APPLICATION_JSON)
                 .content(LOGIN_REQUEST_CONTENT)
                 .accept(APPLICATION_JSON))

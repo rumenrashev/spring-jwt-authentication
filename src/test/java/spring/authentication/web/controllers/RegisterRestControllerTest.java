@@ -16,11 +16,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static spring.authentication.web.constants.AuthenticationPaths.LOGIN_PATH;
+import static spring.authentication.constants.GlobalConstants.REGISTER_URL;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class RegisterControllerTest {
+class RegisterRestControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -33,7 +33,7 @@ class RegisterControllerTest {
     @Test
     @WithMockUser
     void register_ShouldReturnStatusCode403() throws Exception {
-        this.mockMvc.perform(post(LOGIN_PATH)
+        this.mockMvc.perform(post(REGISTER_URL)
                 .contentType(APPLICATION_JSON)
                 .content(REGISTER_REQUEST_CONTENT)
                 .accept(APPLICATION_JSON))
@@ -44,7 +44,7 @@ class RegisterControllerTest {
     void register_ShouldReturnStatusCode200() throws Exception {
         when(registerService.registerUser(new RegisterRequest()))
                 .thenReturn("username");
-        this.mockMvc.perform(post(LOGIN_PATH)
+        this.mockMvc.perform(post(REGISTER_URL)
                 .contentType(APPLICATION_JSON)
                 .content(REGISTER_REQUEST_CONTENT)
                 .accept(APPLICATION_JSON))
