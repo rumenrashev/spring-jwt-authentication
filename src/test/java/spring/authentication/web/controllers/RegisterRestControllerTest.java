@@ -9,6 +9,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import spring.authentication.exception.EmailExistsException;
+import spring.authentication.exception.UsernameExistsException;
 import spring.authentication.service.RegisterService;
 import spring.authentication.web.models.RegisterRequest;
 
@@ -28,26 +30,69 @@ class RegisterRestControllerTest {
     @MockBean
     RegisterService registerService;
 
-    String REGISTER_REQUEST_CONTENT = "{\"username\":\"username\",\"email\":\"admin@email.com\",\"password\":\"passwrod\"}";
+    final String validUsername = "username";
+    final String invalidUsername = "u";
+    final String CONTENT_STRUCTURE = "{\"username\":\"%s\",\"email\":\"admin@email.com\",\"password\":\"password\"}";
+
+    String VALID_REQUEST_CONTENT = String.format(CONTENT_STRUCTURE, validUsername);
+    String INVALID_REQUEST_CONTENT = String.format(CONTENT_STRUCTURE, invalidUsername);
 
     @Test
     @WithMockUser
-    void register_ShouldReturnStatusCode403() throws Exception {
+    void register_ShouldReturnStatusCode403Forbidden() throws Exception {
         this.mockMvc.perform(post(REGISTER_URL)
                 .contentType(APPLICATION_JSON)
-                .content(REGISTER_REQUEST_CONTENT)
+                .content(VALID_REQUEST_CONTENT)
                 .accept(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
+
     @Test
     @WithAnonymousUser
-    void register_ShouldReturnStatusCode200() throws Exception {
+    void register_ShouldReturnStatusCode200_Ok() throws Exception {
         when(registerService.registerUser(new RegisterRequest()))
-                .thenReturn("username");
+                .thenReturn(Mockito.anyString());
         this.mockMvc.perform(post(REGISTER_URL)
                 .contentType(APPLICATION_JSON)
-                .content(REGISTER_REQUEST_CONTENT)
+                .content(VALID_REQUEST_CONTENT)
                 .accept(APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful());
     }
+
+    @Test
+    @WithAnonymousUser
+    void conflict_ShouldReturnStatusCode409ConflictBecauseUsernameIsBusy() throws Exception {
+        Mockito
+                .doThrow(new UsernameExistsException())
+                .when(registerService).registerUser(Mockito.any());
+        this.mockMvc.perform(post(REGISTER_URL)
+                .contentType(APPLICATION_JSON)
+                .content(VALID_REQUEST_CONTENT)
+                .accept(APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void conflict_ShouldReturnStatusCode409ConflictBecauseEmiIsBusy() throws Exception {
+        Mockito
+                .doThrow(new EmailExistsException())
+                .when(registerService).registerUser(Mockito.any());
+        this.mockMvc.perform(post(REGISTER_URL)
+                .contentType(APPLICATION_JSON)
+                .content(VALID_REQUEST_CONTENT)
+                .accept(APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void conflict_ShouldReturnStatusCode400BadRequestBecauseUsernameIsTooShort() throws Exception {
+        this.mockMvc.perform(post(REGISTER_URL)
+                .contentType(APPLICATION_JSON)
+                .content(INVALID_REQUEST_CONTENT)
+                .accept(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
