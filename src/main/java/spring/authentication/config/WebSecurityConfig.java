@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import spring.authentication.web.filters.AuthTokenFilter;
+import spring.authentication.web.filters.CrossOriginFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -26,15 +27,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final AuthenticationEntryPoint unauthorizedHandler;
     private final AuthTokenFilter authenticationJwtTokenFilter;
     private final PasswordEncoder passwordEncoder;
+    private final CrossOriginFilter crossOriginFilter;
 
     public WebSecurityConfig(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService,
                              AuthenticationEntryPoint unauthorizedHandler,
                              AuthTokenFilter authenticationJwtTokenFilter,
-                             PasswordEncoder passwordEncoder) {
+                             PasswordEncoder passwordEncoder,
+                             CrossOriginFilter crossOriginFilter) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
         this.authenticationJwtTokenFilter = authenticationJwtTokenFilter;
         this.passwordEncoder = passwordEncoder;
+        this.crossOriginFilter = crossOriginFilter;
     }
 
     @Override
@@ -59,6 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/test/**").permitAll()
                 .anyRequest().authenticated();
 
+//        http.addFilterBefore(crossOriginFilter,AuthTokenFilter.class);
         http.addFilterBefore(authenticationJwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

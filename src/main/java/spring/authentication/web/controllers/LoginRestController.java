@@ -14,7 +14,6 @@ import static spring.authentication.constants.GlobalConstants.*;
 
 @RestController
 @RequestMapping(LOGIN_URL)
-@CrossOrigin(origins = CLIENT_ADDRESS, maxAge = 3600)
 @PreAuthorize("isAnonymous()")
 public class LoginRestController {
 
